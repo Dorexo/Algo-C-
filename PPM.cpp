@@ -10,29 +10,19 @@
 using namespace std;
 
 
-#include "PGM.h"
+#include "PPM.h"
 
 
 int main(){
 
 
 
-
-    PGM ballons;
-    char ball[30] = "balloons_noisy.ascii.pgm";
-    ballons.lectureFichier(ball);
-
-    PGM copy2(ballons);
-    copy2.filtrerImage(10);
-    char cpy2[30] = "cop.pgm";
-    copy2.ecrireFichier(cpy2);
-
     return 0;
 }
 
 //====================================================================================================================//
 
-void PGM::initImage(){
+void PPM::initImage(){
     if(data== nullptr){
         data=new int*[hauteur];
         for(int i=0;i<hauteur;i++){
@@ -40,7 +30,7 @@ void PGM::initImage(){
         }
     }
 }
-void PGM::supprImage(){
+void PPM::supprImage(){
     if(data!= nullptr){
         for(int i=0;i<hauteur;i++){
             delete[] data[i];
@@ -48,7 +38,7 @@ void PGM::supprImage(){
         delete[] data;
     }
 }
-void PGM::creeImage(int minpix, int maxpix){
+void PPM::creeImage(int minpix, int maxpix){
     srand(time(NULL));
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
@@ -57,19 +47,19 @@ void PGM::creeImage(int minpix, int maxpix){
     }
 }
 
-PGM::PGM(){
+PPM::PPM(){
     sethauteur(0);
     setlargeur(0);
     nbimg++;
 }
-PGM::PGM(int hauteur, int largeur, int minpix, int maxpix){
+PPM::PPM(int hauteur, int largeur, int minpix, int maxpix){
     sethauteur(hauteur);
     setlargeur(largeur);
     initImage();
     creeImage(minpix,maxpix);
     nbimg++;
 }
-PGM::PGM(const PGM &img){
+PPM::PPM(const PPM &img){
     sethauteur(img.hauteur);
     setlargeur(img.largeur);
     initImage();
@@ -80,12 +70,12 @@ PGM::PGM(const PGM &img){
     }
     nbimg++;
 }
-PGM::~PGM(){
+PPM::~PPM(){
     supprImage();
     nbimg--;
 }
 
-void PGM::afficherImage(){
+void PPM::afficherImage(){
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
             cout<<data[i][j]<<" ";
@@ -94,10 +84,10 @@ void PGM::afficherImage(){
     }
 }
 
-void PGM::ecrireFichier(char* nom_fichier){
+void PPM::ecrireFichier(char* nom_fichier){
     ofstream myfile;
     myfile.open (nom_fichier);
-    myfile << "P2\n";
+    myfile << "P3\n";
     myfile << largeur << " " << hauteur <<"\n"<<valeur_max<<"\n";
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
@@ -108,13 +98,13 @@ void PGM::ecrireFichier(char* nom_fichier){
     myfile.close();
 }
 
-void PGM::setpixel(int y, int x, int val){
+void PPM::setpixel(int y, int x, int val){
     if(y>=0 && x>=0 && y<hauteur && x<largeur){
         data[y][x]=val;
     }
 }
 
-void PGM::dessinRect(int x1, int y1, int x2, int y2, int val){
+void PPM::dessinRect(int x1, int y1, int x2, int y2, int val){
     int ii, jj, a, b;
     if(x1>x2){
         jj = x2;
@@ -137,14 +127,14 @@ void PGM::dessinRect(int x1, int y1, int x2, int y2, int val){
     }
 }
 
-void PGM::dessinLigne(int x1, int x2, int line, int val){
+void PPM::dessinLigne(int x1, int x2, int line, int val){
     for (int i = 0; i < line; ++i) {
         setpixel(x2,x1,val);
         x1++;
     }
 }
 
-void PGM::dessinCroix(int x, int y, int val){
+void PPM::dessinCroix(int x, int y, int val){
     setpixel(y-1,x-1,val);
     setpixel(y-1,x+1,val);
     setpixel(y,x,val);
@@ -152,7 +142,7 @@ void PGM::dessinCroix(int x, int y, int val){
     setpixel(y+1,x+1,val);
 }
 
-void PGM::lectureFichier(char* nom_fichier) {
+void PPM::lectureFichier(char* nom_fichier) {
     ifstream monfichier;
     string ligne;
     stringstream s;
@@ -172,7 +162,7 @@ void PGM::lectureFichier(char* nom_fichier) {
     monfichier.close();
 }
 
-void PGM::seuil(int seuil){
+void PPM::seuil(int seuil){
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
             if(data[i][j]>seuil){
@@ -184,7 +174,7 @@ void PGM::seuil(int seuil){
     }
 }
 
-int PGM::moyenne(int x, int y, int size){
+int PPM::moyenne(int x, int y, int size){
     int moy=0;
     int count=0;
     for (int i = y-size; i < y+size; ++i) {
@@ -201,7 +191,7 @@ int PGM::moyenne(int x, int y, int size){
         return moy/count;
     }
 }
-void PGM::flou(int size){
+void PPM::flou(int size){
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
             data[i][j]= moyenne(j,i,size);
@@ -209,7 +199,7 @@ void PGM::flou(int size){
     }
 }
 
-void PGM::selection(int arr[], int n){
+void PPM::selection(int arr[], int n){
     for (int j = 0; j < n; ++j) {
         int min = j;
         for (int i = j+1; i < n; ++i) {
@@ -222,7 +212,7 @@ void PGM::selection(int arr[], int n){
         arr[j] = temp;
     }
 }
-int PGM::median(int x, int y, int size){
+int PPM::median(int x, int y, int size){
     int tab[size*size];
     int a;
     for (int i = y-((int)(size/2)); i < y+((int)(size/2)); ++i) {
@@ -243,7 +233,7 @@ int PGM::median(int x, int y, int size){
     }
     return med;
 }
-void PGM::filtrerImage(int k){
+void PPM::filtrerImage(int k){
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
             data[i][j] = median(j,i,k);
