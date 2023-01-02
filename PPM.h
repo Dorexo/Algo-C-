@@ -12,7 +12,7 @@ class PPM{
         int largeur;
         int hauteur;
         int valeur_max = 255;
-        int** data = nullptr;
+        int*** data = nullptr;
 
     public:
         static int nbimg;
@@ -26,7 +26,7 @@ class PPM{
         void setlargeur(int largeur){this->largeur=largeur;};
         int gethauteur(){return hauteur;};
         int getlargeur(){return largeur;};
-        int** getdata(){return data;};
+        int*** getdata(){return data;};
 
         void initImage();
         void supprImage();
@@ -35,19 +35,15 @@ class PPM{
         void afficherImage();
 
         void ecrireFichier(char* nom_fichier);
-        void setpixel(int y, int x, int val);
-        void dessinRect(int x1, int y1, int x2, int y2, int val);
-        void dessinLigne(int x1, int x2, int line, int val);
-        void dessinCroix(int x, int y, int val);
+        void setpixel(int y, int x, int r, int g, int b);
+        void dessinRect(int x1, int y1, int x2, int y2, int r, int g, int b);
+        void dessinLigne(int x1, int x2, int line, int r, int g, int b);
+        void dessinCroix(int x, int y, int r, int g, int b);
 
         void lectureFichier(char* nom_fichier);
-        void seuil(int seuil);
+        void seuil(int r, int g, int b);
 
-        int moyenne(int x, int y, int size);
+        int moyenne(int x, int y, int size, int rgb);
         void flou(int size);
-
-        void selection(int* arr, int n);
-        int median(int x, int y, int size);
-        void filtrerImage(int k);
 };
 int PPM::nbimg = 0;

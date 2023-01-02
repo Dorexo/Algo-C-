@@ -15,7 +15,10 @@ using namespace std;
 
 int main(){
 
-
+    PPM img;
+    img.lectureFichier("flowerss.ppm");
+    img.flou(5);
+    img.ecrireFichier("flouflowers.ppm");
 
     return 0;
 }
@@ -23,26 +26,35 @@ int main(){
 //====================================================================================================================//
 
 void PPM::initImage(){
-    if(data== nullptr){
-        data=new int*[hauteur];
+    if(data == nullptr){
+        data=new int**[hauteur];
         for(int i=0;i<hauteur;i++){
-            data[i]=new int[largeur];
+            data[i]=new int*[largeur];
+            for (int j = 0; j < largeur; ++j) {
+                data[i][j]=new int[3];
+            }
         }
     }
 }
 void PPM::supprImage(){
-    if(data!= nullptr){
+    if(data != nullptr){
         for(int i=0;i<hauteur;i++){
+            for (int j = 0; j < largeur; ++j) {
+                delete[] data[i][j];
+            }
             delete[] data[i];
         }
         delete[] data;
     }
+    data=nullptr;
 }
 void PPM::creeImage(int minpix, int maxpix){
     srand(time(NULL));
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
-            data[i][j]=rand()%maxpix+minpix;
+            data[i][j][0]=rand()%maxpix+minpix;
+            data[i][j][1]=rand()%maxpix+minpix;
+            data[i][j][2]=rand()%maxpix+minpix;
         }
     }
 }
@@ -65,7 +77,9 @@ PPM::PPM(const PPM &img){
     initImage();
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
-            data[i][j]=img.data[i][j];
+            data[i][j][0]=img.data[i][j][0];
+            data[i][j][1]=img.data[i][j][1];
+            data[i][j][2]=img.data[i][j][2];
         }
     }
     nbimg++;
@@ -78,7 +92,7 @@ PPM::~PPM(){
 void PPM::afficherImage(){
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
-            cout<<data[i][j]<<" ";
+            cout<<data[i][j][0]<<" "<<data[i][j][1]<<" "<<data[i][j][2]<<endl;
         }
         cout<<endl;
     }
@@ -91,27 +105,29 @@ void PPM::ecrireFichier(char* nom_fichier){
     myfile << largeur << " " << hauteur <<"\n"<<valeur_max<<"\n";
     for(int i=0;i<hauteur;i++){
         for(int j=0;j<largeur;j++){
-            myfile<<data[i][j]<<" ";
+            myfile<<data[i][j][0]<<" "<<data[i][j][1]<<" "<<data[i][j][2]<<" ";
         }
         myfile<<"\n";
     }
     myfile.close();
 }
 
-void PPM::setpixel(int y, int x, int val){
+void PPM::setpixel(int y, int x, int r, int g, int b){
     if(y>=0 && x>=0 && y<hauteur && x<largeur){
-        data[y][x]=val;
+        data[y][x][0]=r;
+        data[y][x][1]=g;
+        data[y][x][2]=b;
     }
 }
 
-void PPM::dessinRect(int x1, int y1, int x2, int y2, int val){
-    int ii, jj, a, b;
+void PPM::dessinRect(int x1, int y1, int x2, int y2, int r, int g, int b){
+    int ii, jj, a, c;
     if(x1>x2){
         jj = x2;
-        b = x1;
+        c = x1;
     }else{
         jj = x1;
-        b = x2;
+        c = x2;
     }
     if(y1>y2){
         ii = y2;
@@ -121,25 +137,25 @@ void PPM::dessinRect(int x1, int y1, int x2, int y2, int val){
         a = y2;
     }
     for (int i=ii; i < a+1; ++i){
-        for(int j=jj; j < b+1; ++j){
-            setpixel(i,j,val);
+        for(int j=jj; j < c+1; ++j){
+            setpixel(i,j,r,g,b);
         }
     }
 }
 
-void PPM::dessinLigne(int x1, int x2, int line, int val){
+void PPM::dessinLigne(int x1, int x2, int line, int r, int g, int b){
     for (int i = 0; i < line; ++i) {
-        setpixel(x2,x1,val);
+        setpixel(x2,x1,r,g,b);
         x1++;
     }
 }
 
-void PPM::dessinCroix(int x, int y, int val){
-    setpixel(y-1,x-1,val);
-    setpixel(y-1,x+1,val);
-    setpixel(y,x,val);
-    setpixel(y+1,x-1,val);
-    setpixel(y+1,x+1,val);
+void PPM::dessinCroix(int x, int y, int r, int g, int b){
+    setpixel(y-1,x-1,r,g,b);
+    setpixel(y-1,x+1,r,g,b);
+    setpixel(y,x,r,g,b);
+    setpixel(y+1,x-1,r,g,b);
+    setpixel(y+1,x+1,r,g,b);
 }
 
 void PPM::lectureFichier(char* nom_fichier) {
@@ -155,38 +171,42 @@ void PPM::lectureFichier(char* nom_fichier) {
         initImage();
         for (int i = 0; i < hauteur; ++i) {
             for (int j = 0; j < largeur; ++j) {
-                s >> data[i][j];
+                s >> data[i][j][0] >> data[i][j][1] >> data[i][j][2];
             }
         }
     }
     monfichier.close();
 }
 
-void PPM::seuil(int seuil){
+void PPM::seuil(int r, int g, int b){
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
-            if(data[i][j]>seuil){
-                data[i][j]=valeur_max;
+            if(data[i][j][0]>r && data[i][j][1]>g && data[i][j][2]>b){
+                data[i][j][0]=valeur_max;
+                data[i][j][1]=valeur_max;
+                data[i][j][2]=valeur_max;
             }else{
-                data[i][j]=0;
+                data[i][j][0]=0;
+                data[i][j][1]=0;
+                data[i][j][2]=0;
             }
         }
     }
 }
 
-int PPM::moyenne(int x, int y, int size){
+int PPM::moyenne(int x, int y, int size, int rgb){
     int moy=0;
     int count=0;
     for (int i = y-size; i < y+size; ++i) {
         for (int j = x-size; j < x+size; ++j) {
             if(i>=0 && j>=0 && i<hauteur && j<largeur){
-                moy=moy+data[i][j];
+                moy=moy+data[i][j][rgb];
                 count++;
             }
         }
     }
     if(moy==0){
-        return data[y][x];
+        return data[y][x][rgb];
     }else{
         return moy/count;
     }
@@ -194,49 +214,9 @@ int PPM::moyenne(int x, int y, int size){
 void PPM::flou(int size){
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
-            data[i][j]= moyenne(j,i,size);
-        }
-    }
-}
-
-void PPM::selection(int arr[], int n){
-    for (int j = 0; j < n; ++j) {
-        int min = j;
-        for (int i = j+1; i < n; ++i) {
-            if(arr[i]<arr[min]){
-                min = i;
-            }
-        }
-        int temp = arr[min];
-        arr[min] = arr[j];
-        arr[j] = temp;
-    }
-}
-int PPM::median(int x, int y, int size){
-    int tab[size*size];
-    int a;
-    for (int i = y-((int)(size/2)); i < y+((int)(size/2)); ++i) {
-        a=0;
-        for (int j = x-((int)(size/2)); j < x+((int)(size/2)); ++j) {
-            if(i>=0 && j>=0 && i<hauteur && j<largeur){
-                tab[a]=data[i][j];
-                a++;
-            }
-        }
-    }
-    selection(tab,a);
-    int med;
-    if (a%2==0){
-        med = tab[((int)(a/2+1))-1];
-    }else{
-        med = tab[((int)(a+1/2))-1];
-    }
-    return med;
-}
-void PPM::filtrerImage(int k){
-    for (int i = 0; i < hauteur; ++i) {
-        for (int j = 0; j < largeur; ++j) {
-            data[i][j] = median(j,i,k);
+            data[i][j][0]= moyenne(j,i,size,0);
+            data[i][j][1]= moyenne(j,i,size,1);
+            data[i][j][2]= moyenne(j,i,size,2);
         }
     }
 }
