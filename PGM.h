@@ -46,7 +46,7 @@ class PGM{
         int moyenne(int x, int y, int size);
         void flou(int size);
 
-        void selection(int* arr, int n);
+        void selection(int tab[], int n);
         int median(int x, int y, int size);
         void filtrerImage(int k);
 };

@@ -16,7 +16,7 @@ using namespace std;
 int main(){
 
     PPM img;
-    img.lectureFichier("flowerss.ppm");
+    img.lectureFichier("flowers.ppm");
     img.flou(5);
     img.ecrireFichier("flouflowers.ppm");
 
@@ -212,11 +212,15 @@ int PPM::moyenne(int x, int y, int size, int rgb){
     }
 }
 void PPM::flou(int size){
+    PPM image(*this);
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
-            data[i][j][0]= moyenne(j,i,size,0);
-            data[i][j][1]= moyenne(j,i,size,1);
-            data[i][j][2]= moyenne(j,i,size,2);
+            int moy0 = image.moyenne(j,i,size,0);
+            int moy1 = image.moyenne(j,i,size,1);
+            int moy2 = image.moyenne(j,i,size,2);
+            data[i][j][0]= moy0;
+            data[i][j][1]= moy1;
+            data[i][j][2]= moy2;
         }
     }
 }

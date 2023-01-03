@@ -19,12 +19,12 @@ int main(){
 
 
     PGM ballons;
-    char ball[30] = "balloons_noisy.ascii.pgm";
+    char ball[30] = "lena.pgm";
     ballons.lectureFichier(ball);
 
     PGM copy2(ballons);
-    copy2.filtrerImage(10);
-    char cpy2[30] = "cop.pgm";
+    copy2.flou(10);
+    char cpy2[30] = "flou.pgm";
     copy2.ecrireFichier(cpy2);
 
     return 0;
@@ -203,15 +203,17 @@ int PGM::moyenne(int x, int y, int size){
     }
 }
 void PGM::flou(int size){
+    PGM image(*this);
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
-            data[i][j]= moyenne(j,i,size);
+            int moy = image.moyenne(j,i,size);
+            data[i][j]= moy;
         }
     }
 }
 
 void PGM::selection(int arr[], int n){
-    for (int j = 0; j < n; ++j) {
+    for (int j = 0; j < n-1; ++j) {
         int min = j;
         for (int i = j+1; i < n; ++i) {
             if(arr[i]<arr[min]){
@@ -225,9 +227,8 @@ void PGM::selection(int arr[], int n){
 }
 int PGM::median(int x, int y, int size){
     int tab[size*size];
-    int a;
+    int a=0;
     for (int i = y-((int)(size/2)); i < y+((int)(size/2)); ++i) {
-        a=0;
         for (int j = x-((int)(size/2)); j < x+((int)(size/2)); ++j) {
             if(i>=0 && j>=0 && i<hauteur && j<largeur){
                 tab[a]=data[i][j];
@@ -245,9 +246,11 @@ int PGM::median(int x, int y, int size){
     return med;
 }
 void PGM::filtrerImage(int k){
+    PGM image(*this);
     for (int i = 0; i < hauteur; ++i) {
         for (int j = 0; j < largeur; ++j) {
-            data[i][j] = median(j,i,k);
+            int med = image.median(j,i,k);
+            data[i][j] = med;
         }
     }
 }
