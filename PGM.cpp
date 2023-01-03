@@ -13,22 +13,6 @@ using namespace std;
 #include "PGM.h"
 
 
-int main(){
-
-
-
-
-    PGM ballons;
-    char ball[30] = "lena.pgm";
-    ballons.lectureFichier(ball);
-
-    PGM copy2(ballons);
-    copy2.flou(10);
-    char cpy2[30] = "flou.pgm";
-    copy2.ecrireFichier(cpy2);
-
-    return 0;
-}
 
 //====================================================================================================================//
 

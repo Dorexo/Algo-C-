@@ -13,15 +13,6 @@ using namespace std;
 #include "PPM.h"
 
 
-int main(){
-
-    PPM img;
-    img.lectureFichier("flowers.ppm");
-    img.flou(5);
-    img.ecrireFichier("flouflowers.ppm");
-
-    return 0;
-}
 
 //====================================================================================================================//
 
